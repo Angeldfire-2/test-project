@@ -1461,7 +1461,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     app.ui.updateGamertagStatus(username);
 
     // Insertar automáticamente la URL del voicechat
-    const serverUrl = window.location.origin.replace("https://", "wss://");
+    const serverUrl = window.location.origin.replace("https://", "https://");
     roomInput.value = serverUrl;
 
     // Intentar conexión automática
