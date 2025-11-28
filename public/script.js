@@ -1455,10 +1455,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   try {
     console.log("[AutoConnect] Iniciando conexión automática...");
 
-    if (Tone.context.state !== "running") {
-      await Tone.start();
-      console.log("[AutoConnect] Tone.js activado");
-    }
+    await Tone.start();
+    console.log("[AutoConnect] Tone.js activado");
 
     await app.connectToRoom();
 
