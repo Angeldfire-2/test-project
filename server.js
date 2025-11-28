@@ -8,7 +8,7 @@ const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "..")));
+app.use(express.static(path.join(__dirname, "public")));
 
 let minecraftData = null;
 const clients = new Map(); // Map<WebSocket, { gamertag: string }>
@@ -258,3 +258,4 @@ server.listen(PORT, () => {
   console.log(`🎮 Minecraft endpoint: POST http://localhost:${PORT}/minecraft-data`);
   console.log(`💚 Health check: GET http://localhost:${PORT}/health`);
 });
+
