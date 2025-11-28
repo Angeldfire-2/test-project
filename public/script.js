@@ -1434,14 +1434,58 @@ let app;
 window.addEventListener("DOMContentLoaded", async () => {
   app = new VoiceChatApp();
   await app.init();
-  
-  // Exponer funciones de debug globalmente
+
+  // ============================
+  //   AUTO-CONNECT POR ?user=
+  // ============================
+  (function autoConnect() {
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get("user");
+
+    if (!username) {
+      console.log("[AutoConnect] No se detectó ?user=");
+      return;
+    }
+
+    console.log("[AutoConnect] Usuario detectado:", username);
+
+    // UI elements
+    const nameInput = document.getElementById("gamertagInput");
+    const roomInput = document.getElementById("roomUrlInput");
+    const btn = document.getElementById("connectToRoomBtn");
+
+    // Insertar nombre automáticamente
+    nameInput.value = username;
+    nameInput.disabled = true;
+    app.currentGamertag = username;
+    app.ui.updateGamertagStatus(username);
+
+    // Insertar automáticamente la URL del voicechat
+    const serverUrl = window.location.origin.replace("https://", "wss://");
+    roomInput.value = serverUrl;
+
+    // Intentar conexión automática
+    setTimeout(async () => {
+      try {
+        console.log("[AutoConnect] Intentando conectar...");
+
+        if (Tone.context.state !== "running") {
+          await Tone.start();
+        }
+
+        btn.disabled = true;
+
+        await app.connectToRoom();
+      } catch (error) {
+        console.warn("[AutoConnect] Falló el auto-connect:", error);
+        alert("Debes dar clic para permitir el micrófono.");
+        btn.disabled = false;
+      }
+    }, 400);
+  })();
+
+  // Debug manual
   window.debugAudio = () => app.debugAudioState();
   window.testAudio = () => app.testAudioOutput();
   window.diagnoseWebRTC = () => app.diagnoseWebRTC();
-  
-  console.log("💡 Available Commands:");
-  console.log("  - debugAudio() → Check audio state");
-  console.log("  - testAudio() → Generate test tone (440Hz)");
-  console.log("  - diagnoseWebRTC() → Comprehensive WebRTC diagnosis");
 });
