@@ -1011,14 +1011,6 @@ class VoiceChatApp {
       this.ui.updateGamertagStatus(this.currentGamertag);
     });
 
-    this.ui.elements.connectBtn.addEventListener("click", async () => {
-      if (Tone.context.state !== "running") {
-        await Tone.start();
-        console.log("✓ AudioContext activated");
-      }
-      this.connectToRoom();
-    });
-
     this.ui.elements.muteBtn.addEventListener("click", () => this.toggleMute());
     this.ui.elements.exitBtn.addEventListener("click", () => this.exitCall());
     this.ui.elements.volumeSlider.addEventListener("input", () => this.updateVolume());
@@ -1436,53 +1428,49 @@ window.addEventListener("DOMContentLoaded", async () => {
   await app.init();
 
   // ============================
-  //   AUTO-CONNECT POR ?user=
-  // ============================
-  (function autoConnect() {
-    const params = new URLSearchParams(window.location.search);
-    const username = params.get("user");
+//   AUTO-CONNECT POR ?user=
+// ============================
+(function autoConnect() {
+  const params = new URLSearchParams(window.location.search);
+  const username = params.get("user");
 
-    if (!username) {
-      console.log("[AutoConnect] No se detectó ?user=");
-      return;
-    }
+  if (!username) {
+    console.log("[AutoConnect] No se detectó ?user=");
+    return;
+  }
 
-    console.log("[AutoConnect] Usuario detectado:", username);
+  console.log("[AutoConnect] Usuario detectado:", username);
 
-    // UI elements
-    const nameInput = document.getElementById("gamertagInput");
-    const roomInput = document.getElementById("roomUrlInput");
-    const btn = document.getElementById("connectToRoomBtn");
+  // UI elements
+  const nameInput = document.getElementById("gamertagInput");
+  const roomInput = document.getElementById("roomUrlInput");
 
-    // Insertar nombre automáticamente
-    nameInput.value = username;
-    nameInput.disabled = true;
-    app.currentGamertag = username;
-    app.ui.updateGamertagStatus(username);
+  // Insertar nombre automáticamente
+  nameInput.value = username;
+  nameInput.disabled = true;
+  app.currentGamertag = username;
+  app.ui.updateGamertagStatus(username);
 
-    // Insertar automáticamente la URL del voicechat
-    const serverUrl = window.location.origin.replace("https://", "https://");
-    roomInput.value = serverUrl;
+  // Insertar automáticamente la URL del voicechat
+  const serverUrl = window.location.origin;
+  roomInput.value = serverUrl;
 
-    // Intentar conexión automática
-    setTimeout(async () => {
-      try {
-        console.log("[AutoConnect] Intentando conectar...");
+  // Intentar conexión automática
+  setTimeout(async () => {
+    try {
+      console.log("[AutoConnect] Intentando conectar...");
 
-        if (Tone.context.state !== "running") {
-          await Tone.start();
-        }
-
-        btn.disabled = true;
-
-        await app.connectToRoom();
-      } catch (error) {
-        console.warn("[AutoConnect] Falló el auto-connect:", error);
-        alert("Debes dar clic para permitir el micrófono.");
-        btn.disabled = false;
+      if (Tone.context.state !== "running") {
+        await Tone.start();
       }
-    }, 400);
-  })();
+
+      await app.connectToRoom();
+    } catch (error) {
+      console.warn("[AutoConnect] Falló el auto-connect:", error);
+      alert("Debes permitir acceso al micrófono.");
+    }
+  }, 400);
+})();
 
   // Debug manual
   window.debugAudio = () => app.debugAudioState();
