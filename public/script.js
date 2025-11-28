@@ -1011,6 +1011,14 @@ class VoiceChatApp {
       this.ui.updateGamertagStatus(this.currentGamertag);
     });
 
+    this.ui.elements.connectBtn.addEventListener("click", async () => {
+  if (Tone.context.state !== "running") {
+    await Tone.start();
+    console.log("✓ AudioContext activated");
+  }
+  this.connectToRoom();
+});
+
     this.ui.elements.muteBtn.addEventListener("click", () => this.toggleMute());
     this.ui.elements.exitBtn.addEventListener("click", () => this.exitCall());
     this.ui.elements.volumeSlider.addEventListener("input", () => this.updateVolume());
