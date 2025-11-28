@@ -1427,10 +1427,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   app = new VoiceChatApp();
   await app.init();
 
-  // ============================
-//   AUTO-CONNECT POR ?user=
-// ============================
-(function autoConnect() {
+(async function autoConnect() {
   const params = new URLSearchParams(window.location.search);
   const username = params.get("user");
 
@@ -1441,38 +1438,37 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   console.log("[AutoConnect] Usuario detectado:", username);
 
-  // UI elements
+  // Establecer usuario automáticamente
   const nameInput = document.getElementById("gamertagInput");
   const roomInput = document.getElementById("roomUrlInput");
 
-  // Insertar nombre automáticamente
   nameInput.value = username;
   nameInput.disabled = true;
   app.currentGamertag = username;
   app.ui.updateGamertagStatus(username);
 
-  // Insertar automáticamente la URL del voicechat
-  const serverUrl = window.location.origin;
+  const serverUrl = window.location.origin.replace("https://", "wss://");
   roomInput.value = serverUrl;
 
-  // Intentar conexión automática
-  setTimeout(async () => {
-    try {
-      console.log("[AutoConnect] Intentando conectar...");
+  await new Promise((resolve) => setTimeout(resolve, 300));
 
-      if (Tone.context.state !== "running") {
-        await Tone.start();
-      }
+  try {
+    console.log("[AutoConnect] Iniciando conexión automática...");
 
-      await app.connectToRoom();
-    } catch (error) {
-      console.warn("[AutoConnect] Falló el auto-connect:", error);
-      alert("Debes permitir acceso al micrófono.");
+    if (Tone.context.state !== "running") {
+      await Tone.start();
+      console.log("[AutoConnect] Tone.js activado");
     }
-  }, 400);
+
+    await app.connectToRoom();
+
+  } catch (err) {
+    console.error("[AutoConnect] Falló:", err);
+    alert("⚠️ Permite el micrófono para continuar.");
+  }
+
 })();
 
-  // Debug manual
   window.debugAudio = () => app.debugAudioState();
   window.testAudio = () => app.testAudioOutput();
   window.diagnoseWebRTC = () => app.diagnoseWebRTC();
